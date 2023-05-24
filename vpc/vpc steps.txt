@@ -1,0 +1,17 @@
+1. create VPC
+
+2. create internet gateway
+
+3. attach the internet gateway to the VPC
+
+4. create the Public Subnet
+
+5. create public route table
+
+6. add public route to the public route table
+
+7. assosiate the public subnets with the public oute table
+
+8. //craete the private subnet
+
+9. create the security groups.(for the application load balancer.)
