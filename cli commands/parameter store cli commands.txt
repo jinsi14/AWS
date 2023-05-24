@@ -1,0 +1,7 @@
+get value: String
+
+aws ssm get-parameters --name comman-parameter
+
+get value: secureString(decryption)
+
+aws ssm get-parameters --name parameter-stack-demo2 --with-decryption

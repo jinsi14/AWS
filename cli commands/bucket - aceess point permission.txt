@@ -1,0 +1,61 @@
+//bucket policy
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::829293625760:user/jinsi"
+            },
+            "Action": "*",
+            "Resource": [
+                "arn:aws:s3:::raw-om-rc-ap-south-1-829293625760",
+                "arn:aws:s3:::raw-om-rc-ap-south-1-829293625760/*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "s3:DataAccessPointAccount": "829293625760"
+                }
+            }
+        }
+    ]
+
+
+//prod permission
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::829293625760:user/jinsi"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:ap-south-1:829293625760:accesspoint/prod-access-point/object/cura/prod/*"
+        }
+    ]
+}
+
+
+//non-prod permission
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::829293625760:user/jinsi"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:ap-south-1:829293625760:accesspoint/non-prod-access-point/object/cura/non-prod/*"
+        }
+    ]
+}

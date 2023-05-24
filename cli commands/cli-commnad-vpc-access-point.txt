@@ -1,0 +1,24 @@
+#get-object
+
+- prod-vpc-access
+aws s3api get-object --key cura/non-prod/02-05-2023.PNG --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/non-prod-access 02-05-2023.PNG
+
+-non-proad-access
+aws s3api get-object --key cura/prod/01-05-2023.PNG --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/prod-accesspoint 01-05-2023.PNG
+
+
+aws s3api get-object --key cura/prod/01-05-2023.PNG --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/testing-vpc-access-point 01-05-2023.PNG
+
+
+
+//prod
+aws s3api put-object --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/vpc-prod-access-point --key cura/prod/demo-111.png --body demo-111.PNG  --server-side-encryption AES256
+
+
+//non-prod
+
+aws s3api put-object --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/vpcnon-prod-access-point  --key cura/non-prod/01-05-2023.PNG --body 01-05-2023.PNG --server-side-encryption AES256
+
+
+//delete object
+aws s3api delete-object --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/testing-vpc-access-point --key fatca/prod/x.png

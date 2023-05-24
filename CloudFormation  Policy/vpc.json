@@ -1,0 +1,180 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+  
+    "Description" : "Create VPC",
+  
+    "Parameters" : {
+        "pVpcCIDR":{
+            "Default": "10.0.0.0/16",
+            "Description":"Please enter the IP range (CIDR notaton) for this VPC",
+            "Type": "String"
+        },
+        "pSubnetCIDR":{
+            "Default": "10.0.0.0/24",
+            "Description":"Please enter the IP range (CIDR notaton) for this subnet",
+            "Type": "String"
+        }
+        
+    },
+  
+    "Resources" : {
+        "rVPC" :{
+            "Type" : "AWS::EC2::VPC",
+            "Properties" : {
+                "CidrBlock" : {
+                    "Ref":"pVpcCIDR"
+                } ,
+                "EnableDnsHostnames" : true ,
+                "EnableDnsSupport" : true ,
+                "InstanceTenancy" : "default" ,
+                "Tags" :[
+                    {
+                        "Key":"Name",
+                        "Value":"prod vpc"
+                    }
+                ]
+            }
+        },
+        "rInternetGateway": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties":{
+                "Tags":[
+                    {
+                        "Key":"Name",
+                        "Value":"prod IGM"
+                    }
+                ]
+            }
+        },
+        "rInternetGatewayAttachment":{
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "InternetGatewayId": {
+                    "Ref":"rInternetGateway"
+                },
+                "VpcId": {
+                    "Ref": "rVPC"
+                }
+            }
+        },
+        "rSubnet": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                
+                "CidrBlock": {
+                    "Ref": "pSubnetCIDR"
+                },
+                "MapPublicIpOnLaunch": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value":"prod sunbet"
+                    }
+                ],
+                "VpcId":{
+                    "Ref":"rVPC"
+                }
+            }
+        },
+        "rRouteTable":{
+            "Type":"AWS::EC2::RouteTable",
+            "Properties":{
+                "Tags":[
+                    {
+                        "Key":"Name",
+                        "Value":"prod Route Table"
+                    }
+                ],
+                "VpcId":{
+                    "Ref": "rVPC"
+                }
+            }
+        },
+        "rRoute":{
+            "Type":"AWS::EC2::Route",
+            "Properties":{
+                "DestinationCidrBlock":"0.0.0.0/0",
+                "GatewayId":{
+                    "Ref":"rInternetGateway"
+                },
+                "RouteTableId":{
+                    "Ref":"rRouteTable"
+                }
+            }
+        },
+        "rSubnetRouteTableAssociation":{
+            "Type":"AWS::EC2::SubnetRouteTableAssociation",
+            "Properties":{
+                "RouteTableId":{
+                    "Ref":"rRouteTable"
+                },
+                "SubnetId": {
+                    "Ref": "rSubnet"
+                }
+            }
+        },
+        "rSecurityGroup":{
+            "Type":"AWS::EC2::SecurityGroup",
+            "Properties":{
+                "GroupDescription":"Enable HTTP/HTTPS access on port 80/443",
+                "SecurityGroupIngress":[
+                    {
+                        "IpProtocol":"tcp",
+                        "FromPort":80,
+                        "ToPort" : 80,
+                        "CidrIp" : "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol" : "tcp",
+                        "FromPort" : 443,
+                        "ToPort" : 443,
+                        "CidrIp" : "0.0.0.0/0"
+                    }
+                ],
+                "Tags":[{
+                    "Key":"Name",
+                    "Value":"Prod security group"
+                }],
+                "VpcId":{
+                    "Ref":"rVPC"
+                }
+            }
+        }
+    },
+    
+    "Outputs" : {
+        "VPC":{
+            "Description":"VPC ID",
+            "Export":{
+                "Name":{
+                    "Fn::Sub":"${AWS::StackName}-VPC"
+                }
+            },
+            "Value":{
+                "Ref":"rVPC"
+            }
+        },
+        "Subnet":{
+            "Description":"Subnet ID",
+            "Export":{
+                "Name":{
+                    "Fn::Sub":"${AWS::StackName}-Subnet"
+                }
+            },
+            "Value":{
+                "Ref":"rSubnet"
+            }
+        },
+        "SecurityGroup":{
+            "Description":"Application load balancer security group id",
+            "Export":{
+                "Name":{
+                    "Fn::Sub":"${AWS::StackName}-SecurityGroup"
+                }
+            },
+            "Value":{
+                "Ref":"rSecurityGroup"
+            }
+        }
+    }
+}

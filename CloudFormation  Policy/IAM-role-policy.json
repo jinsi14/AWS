@@ -1,0 +1,51 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters":{
+    "pRoleName":{
+      "Type":"String",
+      "Default":"Customer_s3_test"
+    }
+  },
+  "Resources": {
+    "Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "s3.amazonaws.com"
+            },	
+            "Action": "sts:AssumeRole"
+          }
+          ]
+        },
+        "RoleName": 
+        {
+          "Ref":"pRoleName"
+        },
+        "Path": "/",
+        "Policies": [{
+          "PolicyName": "pRoleName",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [{
+              "Action": [
+                
+                "s3:GetObject"
+                
+              ],
+              "Resource": [
+                "arn:aws:sts::342478014409:assumed-role/AWSManagedServicesAdminRole/PKhunt@oldmutual.com"
+              ],
+              "Effect": "Allow",
+              "Sid": "AllowS3ObjectSid"
+            }
+            ]
+          }
+        }]
+      }
+    }
+  }
+}

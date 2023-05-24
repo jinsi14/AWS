@@ -1,0 +1,106 @@
+//bucket policy
+
+
+{
+    "Version": "2012-10-17",
+    "Id": "Policy1683531758185",
+    "Statement": [
+        {
+            "Sid": "Stmt1683531756009",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::jinsi-test-bucket",
+                "arn:aws:s3:::jinsi-test-bucket/object/*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "s3:DataAccessPointAccount": "829293625760"
+                }
+            }
+        }
+    ]
+}
+
+//vpc access policy
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::829293625760:user/jinsi",
+                    "arn:aws:iam::829293625760:role/test_role"
+                ]
+            },
+            "Action": [
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:ap-south-1:829293625760:accesspoint/test-vpc/object/*"
+        }
+    ]
+}
+
+
+//internet access policy
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::829293625760:role/test_role",
+                    "arn:aws:iam::829293625760:user/jinsi"
+                ]
+            },
+            "Action": [
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:ap-south-1:829293625760:accesspoint/test-internet/object/*"
+        }
+    ]
+}
+
+
+//IAM policy
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:ap-south-1:829293625760:accesspoint/test-vpc/object/*",
+                "arn:aws:s3:ap-south-1:829293625760:accesspoint/test-internet/object/*"
+            ]
+        }
+    ]
+}
+

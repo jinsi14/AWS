@@ -1,0 +1,41 @@
+1.  get command to store s3-bucket file in local(download)
+
+aws s3api get-object --key 11-04-2023.png --bucket arn:aws:s3:eu-north-1:829293625760:accesspoint/get-put-access download.jpg
+
+2. delete file from s3-bucket
+
+aws s3api delete-object --bucket arn:aws:s3:eu-north-1:829293625760:accesspoint/get-put-access --key 11-04-2023.png
+
+3. put commad in bucket from local
+
+aws s3api put-object --bucket arn:aws:s3:eu-north-1:829293625760:accesspoint/get-put-access --key 28-04-2023.png --body C:\Users\prash\Desktop\pp\task\28-04-2023.png
+or
+aws s3 cp 04-05-2023.png s3://arn:aws:s3:ap-southeast-2:829293625760:accesspoint/get-put-access
+
+4. connect with EC2 machine
+
+ssh -i C:\Users\prash\Desktop\pp\AWS\raw-om-rc-ap-key ec2-ubuntu@13.239.63.191
+
+5. debug any command
+
+aws s3api get-object --key 11-04-2023.png --bucket arn:aws:s3:eu-north-1:829293625760:accesspoint/get-put-access download.jpg --debug
+
+6. list from bucket
+
+aws s3 ls 04-05-2023.png s3://arn:aws:s3:ap-southeast-2:829293625760:accesspoint/get-put-access
+
+
+
+
+
+// check bucket list 
+
+aws s3 ls
+
+//open bucket 
+
+aws s3 ls s3://raw-om-rc-ap-southeast-2-829293625760
+
+//open any file in EC2 machine
+
+nano <filename.extention>

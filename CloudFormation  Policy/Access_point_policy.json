@@ -1,0 +1,114 @@
+{
+    "Transform": "AWS::LanguageExtensions",
+    "Parameters": {
+      "pBucketName": {
+        "Type": "String",
+        "Description": "(REQUIRED) Provide a name of bucket on which access point is required",
+        "Default": "raw-om-rc-eu-west-1-342478014409"
+      },
+      "pAccessPointName": {
+        "Type": "String",
+        "Description": "(REQUIRED) Provide a name of access point",
+        "Default": "fatca-admin-prod"
+      },
+      "pVpcId": {
+        "Type": "String",
+        "Description": "(REQUIRED) Provide a VpcId",
+        "Default" : "vpc-08004ce5762891f77"
+      },
+      "pActions": {
+        "Type": "CommaDelimitedList",
+        "Description": "(REQUIRED) comma-separated list of actions for which grant the permission",
+        "Default" : "s3:GetObject,s3:PutObject"
+      },
+      "pDeleteActions": {
+        "Type":"String",
+        "Description": "(REQUIRED) actions for which grant the permission",
+        "Default" : "s3:DeleteObject"
+      },
+      "pResource": {
+        "Type": "CommaDelimitedList",
+        "Description": "(REQUIRED) List the comma separated resources for which allow the access",
+        "Default": "arn:aws:s3:eu-west-1:342478014409:accesspoint/fatca-admin-prod/object/*"
+      },
+      "pPrincipal": {
+        "Type": "CommaDelimitedList",
+        "Description": "(REQUIRED) List the comma separated principal to whom allow the access",
+        "Default":"arn:aws:iam::342478014409:root,arn:aws:iam::770106725204:role/customer-mc-ec2-instance-profile-s3,arn:aws:iam::633419547942:role/customer-mc-ec2-instance-profile-s3,arn:aws:iam::342478014409:instance-profile/customer_om_groupcompliance-nonprod-ec2-s3-custom,arn:aws:iam::342478014409:instance-profile/customer-mc-ec2-instance-profile-s3"
+      },
+      "pDenyDeletePrinciple":{
+          "Type": "CommaDelimitedList",
+          "Description":"(REQUIRED) List the comma separated resources for which deny the access",
+          "Default":"arn:aws:iam::770106725204:role/customer-mc-ec2-instance-profile-s3"
+      }
+    },
+    "AWSTemplateFormatVersion": "2010-09-09",
+  
+    "Resources": {
+      "S3AccessPoint": {
+        "Type": "AWS::S3::AccessPoint",
+        "Properties": {
+          "Bucket": {
+            "Ref": "pBucketName"
+          },
+          "Name": {
+            "Ref": "pAccessPointName"
+          },
+          "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "IgnorePublicAcls": true,
+            "BlockPublicPolicy": true,
+            "RestrictPublicBuckets": true
+          },
+          "VpcConfiguration": {
+            "VpcId": {
+              "Ref" : "pVpcId"
+            }
+          },
+          "Policy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "AllowAccessPointFatca",
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS" : {
+                    "Ref" : "pPrincipal"
+                  }
+                },
+                "Action": {
+                  "Ref":"pActions"
+                },
+                "Resource": {
+                  "Ref" : "pResource"
+                }
+              },
+              {
+                "Sid": "AllowDeleteObject",
+                "Action": {
+                  "Ref":"pDeleteActions"
+                },
+                "Effect": "Allow",
+                "Resource": {
+                  "Ref" : "pResource"
+                },
+                "Principal": {
+                  "AWS": {
+                    "Ref":"pDenyDeletePrinciple"
+                  }
+                },
+                "Condition": {
+                  "StringEquals": {
+                    "aws:userid": [
+                      "AROAT3YC3VN5RBVDUV6FF:pkhunt@oldmutual.com",
+                      "AROAT3YC3VN5RBVDUV6FF:gedwards@oldmutual.com"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }

@@ -1,0 +1,111 @@
+
+{
+    "Description": "Create S3 bucket",
+    "Parameters":{
+        "pBucketName":{
+            "Type":"String",
+            "Default":"raw-om-rc-ap-south-1-829293625760"
+        },
+        "pAccountId":{
+          "Type":"String",
+          "Default":"829293625760"
+        },
+        "PUser":{
+          "Type":"String",
+          "Default":"jinsi"
+        },
+        "pPrincipal": {
+          "Type": "CommaDelimitedList",
+          "Description": "(REQUIRED) List the comma separated principal to whom allow the access"
+      }
+    },
+    "Resources": {
+      "rMyBucket": {
+        "Type": "AWS::S3::Bucket",
+        "Properties": {
+          "BucketName": { "Ref" : "pBucketName"},
+          "BucketEncryption": {
+            "ServerSideEncryptionConfiguration": [
+              {
+                "BucketKeyEnabled" : true,
+                "ServerSideEncryptionByDefault": {
+                  "SSEAlgorithm": "AES256"
+                }
+              }
+            ]
+          },
+          "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": true,
+            "BlockPublicPolicy": true,
+            "IgnorePublicAcls": true,
+            "RestrictPublicBuckets": true
+          }
+        }
+      },
+      "MyBucketPolicy": {
+        "Type": "AWS::S3::BucketPolicy",
+        "Properties": {
+          "Bucket": {
+            "Ref": "rMyBucket"
+          },
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                 "Effect": "Allow",
+                 "Principal": {
+                  "AWS" : {
+                    "Ref" : "pPrincipal"
+                    }
+                  },
+                 "Action": ["s3:GetObject","s3:PutObject"],
+                 "Resource": [
+                    {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:s3:::",
+                                {
+                                    "Ref": "rMyBucket"
+                                  },
+                                  "/*"
+                            ]
+                        ]
+                    }
+                ]
+               },
+               {
+                "Sid": "Stmt1684753014909",
+                "Action": [
+                  "s3:PutObject"
+                ],
+                "Effect": "deny",
+                
+                "Resource": [
+                  {
+                      "Fn::Join": [
+                          "",
+                          [
+                              "arn:aws:s3:::",
+                              {
+                                  "Ref": "rMyBucket"
+                                },
+                                "/*"
+                          ]
+                      ]
+                  }
+              ],
+                "Condition": {
+                  "Null": {
+                    "s3:x-amz-server-side-encryption": "true"
+                  }
+                },
+                "Principal": "*"
+              }
+
+             ]
+           }
+         }
+       }
+     }
+   } 

@@ -1,0 +1,117 @@
+{
+    "Description": "Create S3 bucket",
+    "Parameters":{
+        "pBucketName":{
+            "Type":"String",
+            "Default":"demo-example1111-bucket"
+        }
+    },
+    "Resources": {
+      "rBucket": {
+        "Type": "AWS::S3::Bucket",
+        "Properties": {
+          "BucketName": { "Ref" : "pBucketName"},
+          "PublicAccessBlockConfiguration": {
+            "BlockPublicAcls": false,
+            "BlockPublicPolicy": false,
+            "IgnorePublicAcls": false,
+            "RestrictPublicBuckets": false
+            
+          }
+        }
+      },
+      "rBucketPolicy": {
+        "Type": "AWS::S3::BucketPolicy",
+        "Properties": {
+          "Bucket": {
+            "Ref": "rBucket"
+          },
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                 "Effect": "Allow",
+                 "Principal": "*",
+                 "Action": ["s3:GetObject","s3:PutObject"],
+                 "Resource":[
+                    {
+                        "Fn::GetAtt": [
+                            "rBucket",
+                            "Arn"
+                        ]
+                    },
+                    {
+                        "Fn::Join":[
+                            "",
+                            [
+                                {
+                                    "Fn::GetAtt":[
+                                        "rBucket",
+                                        "Arn"
+                                    ]
+                                },
+                                "/*"
+                            ]
+                        ]
+                    }
+                ]
+
+               }
+             ]
+           }
+         }
+       },
+       "S3AccessPoint": {
+        "Type": "AWS::S3::AccessPoint",
+        "Properties": {
+            "Bucket": {
+                "Ref": "rBucket"
+            },
+            "Name": "my-access-point2",
+            "Policy": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Action": [
+                            "s3:GetObject",
+                            "s3:PutObject"
+                        ],
+                        "Effect": "Allow",
+                        
+                        "Resource": [
+                            {
+                                "Fn::Sub": "arn:${AWS::Partition}:s3:${AWS::Region}:${AWS::AccountId}:accesspoint/my-access-point2/object/*"
+                            }
+                        ],
+                        "Principal": {
+                            "AWS": {
+                                "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:user/jinsi"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+     },
+     "Outputs": {
+        "S3AccessPointArn": {
+            "Value": {
+                "Fn::GetAtt": ["S3AccessPoint", "Arn"]
+            },
+            "Description": "ARN of the sample Amazon S3 access point."
+        },
+        "S3AccessPointName": {
+            "Value": {
+                "Fn::GetAtt": ["S3AccessPoint", "Name"]
+            },
+            "Description": "Name of the sample Amazon S3 access point."
+        },
+        "S3AccessPointAlias": {
+            "Value": {
+                "Fn::GetAtt": ["S3AccessPoint", "Alias"]
+            },
+            "Description": "Alias of the sample Amazon S3 access point."
+        }
+    }
+} 

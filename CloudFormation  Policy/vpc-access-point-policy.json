@@ -1,0 +1,96 @@
+{
+    "Description": "Create Access point",
+    "Parameters":{
+        "pBucketName":{
+            "Type":"String",
+            "Default":"raw-om-rc-ap-south-1-829293625760"
+        },
+        "pVPC":{
+            "Type":"String",
+            "Default":"vpc-0be09793b159a0950"
+        },
+        "pAccessPoint":{
+            "Type":"String",
+            "Default":"testing-vpc-access-point"
+        },
+        "pUser":{
+            "Type":"String",
+            "Default":"jinsi"
+        },
+        "pFolder":{
+            "Type":"String",
+            "Default":"cura/prod"
+        },
+        "pPrincipal": {
+            "Type": "CommaDelimitedList",
+            "Description": "(REQUIRED) List the comma separated principal to whom allow the access"
+        }
+    },
+    "Resources": {
+       "rAccessPoint": {
+        "Type": "AWS::S3::AccessPoint",
+        "Properties": {
+            "Bucket": {
+                "Ref":"pBucketName"
+            },
+            "Name": {
+                "Ref":"pAccessPoint"
+            },
+            "VpcConfiguration": {
+                "VpcId": {
+                    "Ref": "pVPC"
+                }
+            },
+            "PublicAccessBlockConfiguration": {
+                "BlockPublicAcls": true,
+                "IgnorePublicAcls": true,
+                "BlockPublicPolicy": true,
+                "RestrictPublicBuckets": true
+            },
+            "Policy": {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Action": [
+                            "s3:GetObject",
+                            "s3:PutObject"
+                        ],
+                        "Effect": "Allow",
+                        
+                        "Resource": [
+                            {
+                                "Fn::Sub": "arn:${AWS::Partition}:s3:${AWS::Region}:${AWS::AccountId}:accesspoint/${pAccessPoint}/object/${pFolder}/*"
+                            }
+                        ],
+                        "Principal": {
+                            "AWS": {
+                                "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:user/${pUser}"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+    },
+     "Outputs": {
+        "AccessPointArn": {
+            "Value": {
+                "Fn::GetAtt": ["rAccessPoint", "Arn"]
+            },
+            "Description": "ARN of the sample Amazon S3 access point."
+        },
+        "AccessPointName": {
+            "Value": {
+                "Fn::GetAtt": ["rAccessPoint", "Name"]
+            },
+            "Description": "Name of the sample Amazon S3 access point."
+        },
+        "AccessPointAlias": {
+            "Value": {
+                "Fn::GetAtt": ["rAccessPoint", "Alias"]
+            },
+            "Description": "Alias of the sample Amazon S3 access point."
+        }
+    }
+} 
