@@ -22,3 +22,17 @@ aws s3api put-object --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/vpc
 
 //delete object
 aws s3api delete-object --bucket arn:aws:s3:ap-south-1:829293625760:accesspoint/testing-vpc-access-point --key fatca/prod/x.png
+
+
+
+
+
+//command to transfer file local machine to ec2 machine
+
+ 
+scp -i ./test_key.pem ./raw-om-rc-student-data.csv ubuntu@ec2-3-108-228-186.ap-south-1.compute.amazonaws.com:~/.
+
+
+
+
+
