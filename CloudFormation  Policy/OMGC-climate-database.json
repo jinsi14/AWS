@@ -1,0 +1,82 @@
+{
+    "Parameters": {
+        "pAccountNumber": {
+            "Type": "String"
+        },
+        "pSystemBucket": {
+            "Type": "String"
+        },
+        "pProjectName":{
+            "Type":"String"
+        },
+        "pEnvironment": {
+            "Type": "String",
+            "Default": "non-prod"
+        },
+        "pGlueServiceName":{
+            "Type":"String",
+            "Default":"database"
+        }
+    },
+    "Resources": {
+        "rDatabase": {
+            "Type": "AWS::Glue::Database",
+            "Properties": {
+                "CatalogId": {
+                    "Ref": "pAccountNumber"
+                },
+                "DatabaseInput": {
+                    "LocationUri": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "s3://",
+                                {
+                                    "Ref": "pSystemBucket"
+                                },
+                                "/",
+                                {
+                                    "Ref":"pProjectName"
+                                },
+                                "/",
+                                {
+                                    "Ref": "pEnvironment"
+                                },
+                                "/"
+                            ]
+                        ]
+                    },
+                    "Name": {
+                        "Fn::Join": [
+                            "_",
+                            [
+                                "omgc",
+                                {
+                                    "Ref":"pProjectName"
+                                },
+                                {
+                                    "Ref": "pEnvironment"
+                                },
+                                {
+                                    "Ref": "pGlueServiceName"
+                                }
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "oDatabaseName": {
+            "Value": {
+                "Ref": "rDatabase"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-DatabaseName"
+                }
+            }
+        }
+    }
+}

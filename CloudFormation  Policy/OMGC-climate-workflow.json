@@ -1,0 +1,37 @@
+{
+    "Parameters": {
+        "pMaxConcurrentRuns": {
+            "Type": "Number"
+        },
+        "pworkflowName":{
+            "Type":"String",
+            "Default":"OMGC-climate-workflow"
+        }
+    },
+    "Resources": {
+        "rWorkflow": {
+            "Type": "AWS::Glue::Workflow",
+            "Properties": {
+                "Description": "Transfers data between storage layers",
+                "MaxConcurrentRuns": {
+                    "Ref": "pMaxConcurrentRuns"
+                },
+                "Name": {
+                    "Ref":"pworkflowName"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "oWorkflow": {
+            "Value": {
+                "Ref": "rWorkflow"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-WorkflowName"
+                }
+            }
+        }
+    }
+}

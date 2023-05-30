@@ -1,0 +1,102 @@
+{
+    "Parameters": {
+        "pProjectName":{
+            "Type":"String"
+        },
+        "pEnvironment": {
+            "Type": "String",
+            "Default": "non-prod"
+        },
+        "pRoleARN": {
+            "Type": "String"
+        },
+        "pGlueDatabaseStackName": {
+            "Type": "String"
+        },
+        "pSystemBucket":{
+            "Type":"String"
+        },
+        "pGlueServiceName":{
+            "Type":"String",
+            "Default":"crawler"
+        }
+    },
+    "Resources": {
+        "rCrawler": {
+            "Type": "AWS::Glue::Crawler",
+            "Properties": {
+                "DatabaseName": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${pGlueDatabaseStackName}-DatabaseName"
+                    }
+                },
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            {
+                                "Ref":"pEnvironment"
+                            },
+                            {
+                                "Ref":"pGlueServiceName"
+                            }
+                        ]
+                    ]
+                },
+                "RecrawlPolicy": {
+                    "RecrawlBehavior": "CRAWL_EVERYTHING"
+                },
+                "Role": {
+                    "Ref": "pRoleARN"
+                },
+                "SchemaChangePolicy": {
+                    "DeleteBehavior": "DELETE_FROM_DATABASE",
+                    "UpdateBehavior": "UPDATE_IN_DATABASE"
+                },
+                "Targets": {
+                    "S3Targets": [
+                        {
+                            "Path": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "s3://",
+                                        {
+                                            "Ref": "pSystemBucket"
+                                        },
+                                        "/",
+                                        {
+                                            "Ref":"pProjectName"
+                                        },
+                                        "/",
+                                        {
+                                            "Ref": "pEnvironment"
+                                        },
+                                        "/"
+                                    ]
+                                ]
+                            },
+                            "SampleSize": 10
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "oCuraTrustedCrawler": {
+            "Value": {
+                "Ref": "rCrawler"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CrawlerName"
+                }
+            }
+        }
+    }
+}

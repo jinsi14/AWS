@@ -1,0 +1,109 @@
+{
+    "Parameters": {
+        "pAccountNumber": {
+            "Type": "String"
+        },
+        "pRegion": {
+            "Type": "String",
+            "Default": "ap-south-1"
+        },
+        "pSystemBucket":{
+            "Type":"String",
+            "Default":"aws-glue-assets-829293625760-ap-south-1"
+        },
+        "pEnvironment":{
+          "Type":"String",
+          "Default":"scripts"  
+        },
+        "pScriptFile":{
+            "Type":"String",
+            "Default":"read data.py"
+        },
+        "pRoleARN": {
+            "Type": "String"
+        },
+        "pGlueJobTimeout": {
+            "Type": "Number",
+            "Default": 60
+        },
+        "pProjectName":{
+            "Type":"String"
+        },
+        "pGlueServiceName":{
+            "Type":"String",
+            "Default":"job"
+        }
+    },
+    "Resources": {
+        "rGlueJob": {
+            "Type": "AWS::Glue::Job",
+            "Properties": {
+                "Command": {
+                    "Name": "glueetl",
+                    "ScriptLocation": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "s3://",
+                                {
+                                    "Ref": "pSystemBucket"
+                                },
+                                "/",
+                                {
+                                    "Ref": "pEnvironment"
+                                },
+                                "/",
+                                {
+                                    "Ref": "pScriptFile"
+                                }
+                            ]
+                        ]
+                    },
+                    "PythonVersion": "3"
+                },
+                "DefaultArguments": {
+                    "--enable-metrics": "true",
+                    "--enable-continuous-cloudwatch-log": "true",
+                    "--job-bookmark-option": "job-bookmark-disable",
+                    "--job-language": "python"
+                },
+                "GlueVersion": "4.0",
+                "MaxRetries": 1,
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            {
+                                "Ref":"pGlueServiceName"
+                            }
+                        ]
+                    ]
+                },
+                "NumberOfWorkers": 2,
+                "Role": {
+                    "Ref": "pRoleARN"
+                },
+                "Timeout": {
+                    "Ref": "pGlueJobTimeout"
+                },
+                "WorkerType": "G.1X"
+            }
+        }
+    },
+    "Outputs": {
+        "oIngestToTrustedGlueJobName": {
+            "Value": {
+                "Ref": "rGlueJob"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-GlueJobName"
+                }
+            }
+        }
+    }
+}

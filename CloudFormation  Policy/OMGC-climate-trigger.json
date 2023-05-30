@@ -1,0 +1,59 @@
+{
+    "Parameters": {
+        "pGlueJobStackName": {
+            "Type": "String"
+        },
+        "pGlueCrawlerStackName": {
+            "Type": "String"
+        },
+        "pProjectName":{
+            "Type":"String"
+        },
+        "pEnvironment":{
+            "Type":"String",
+            "Default":"non-prod"
+        },
+        "pGlueServiceName":{
+            "Type":"String",
+            "Default":"trigger"
+        }
+    },
+    "Resources": {
+        "rGlueJobTrigger": {
+            "Type": "AWS::Glue::Trigger",
+            "Properties": {
+                "Actions": [
+                    {
+                        "Arguments": {},
+                        "JobName": {
+                            "Fn::ImportValue": {
+                                "Fn::Sub": "${pGlueJobStackName}-GlueJobName"
+                            }
+                        },
+                        "Timeout": 60
+                    }
+                ],
+                "Description": "Triggers a Glue Job",
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            {
+                                "Ref":"pEnvironment"
+                            },
+                            {
+                                "Ref":"pGlueServiceName"
+                            }
+                        ]
+                    ]
+                },
+                "Type": "ON_DEMAND"
+            }
+        }
+    }
+}
+
