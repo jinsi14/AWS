@@ -1,6 +1,11 @@
-git clone
+//git clone
 
 git clone https://jinsi14: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@github.com/jinsi14/AWS.git
+
+
+//SSH key generate
+
+ ssh-keygen -o -t rsa -C "jinsi.viradiya24@gmail.com"
 
 
 password
