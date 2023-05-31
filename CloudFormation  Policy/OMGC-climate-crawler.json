@@ -1,7 +1,15 @@
 {
     "Parameters": {
-        "pProjectName":{
+        "pAccountNumber":{
             "Type":"String"
+        },
+        "pRegion":{
+            "Type":"String",
+            "Default":"ap-south-1"
+        },
+        "pProjectName":{
+            "Type":"String",
+            "Default":"climate"
         },
         "pEnvironment": {
             "Type": "String",
@@ -12,17 +20,10 @@
         },
         "pGlueDatabaseStackName": {
             "Type": "String"
-        },
-        "pSystemBucket":{
-            "Type":"String"
-        },
-        "pGlueServiceName":{
-            "Type":"String",
-            "Default":"crawler"
         }
     },
     "Resources": {
-        "rCrawler": {
+        "rTrustedCrawler": {
             "Type": "AWS::Glue::Crawler",
             "Properties": {
                 "DatabaseName": {
@@ -38,12 +39,8 @@
                             {
                                 "Ref":"pProjectName"
                             },
-                            {
-                                "Ref":"pEnvironment"
-                            },
-                            {
-                                "Ref":"pGlueServiceName"
-                            }
+                            "trusted",
+                            "crawler"
                         ]
                     ]
                 },
@@ -64,9 +61,14 @@
                                 "Fn::Join": [
                                     "",
                                     [
-                                        "s3://",
+                                        "s3://trusted-om-rc",
+                                        "-",
                                         {
-                                            "Ref": "pSystemBucket"
+                                            "Ref": "pRegion"
+                                        },
+                                        "-",
+                                        {
+                                            "Ref": "pAccountNumber"
                                         },
                                         "/",
                                         {
@@ -90,7 +92,7 @@
     "Outputs": {
         "oCuraTrustedCrawler": {
             "Value": {
-                "Ref": "rCrawler"
+                "Ref": "rTrustedCrawler"
             },
             "Export": {
                 "Name": {

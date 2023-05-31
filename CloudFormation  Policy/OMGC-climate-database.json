@@ -3,23 +3,21 @@
         "pAccountNumber": {
             "Type": "String"
         },
-        "pSystemBucket": {
-            "Type": "String"
+        "pRegion":{
+            "Type":"String",
+            "Default":"ap-south-1"
         },
         "pProjectName":{
-            "Type":"String"
+            "Type":"String",
+            "Default":"climate"
         },
         "pEnvironment": {
             "Type": "String",
             "Default": "non-prod"
-        },
-        "pGlueServiceName":{
-            "Type":"String",
-            "Default":"database"
         }
     },
     "Resources": {
-        "rDatabase": {
+        "rTrustedDatabase": {
             "Type": "AWS::Glue::Database",
             "Properties": {
                 "CatalogId": {
@@ -30,9 +28,14 @@
                         "Fn::Join": [
                             "",
                             [
-                                "s3://",
+                                "s3://trusted-om-rc",
+                                "-",
                                 {
-                                    "Ref": "pSystemBucket"
+                                    "Ref": "pRegion"
+                                },
+                                "-",
+                                {
+                                    "Ref": "pAccountNumber"
                                 },
                                 "/",
                                 {
@@ -54,12 +57,8 @@
                                 {
                                     "Ref":"pProjectName"
                                 },
-                                {
-                                    "Ref": "pEnvironment"
-                                },
-                                {
-                                    "Ref": "pGlueServiceName"
-                                }
+                                "trusted",
+                                "database"
                             ]
                         ]
                     }
@@ -70,7 +69,7 @@
     "Outputs": {
         "oDatabaseName": {
             "Value": {
-                "Ref": "rDatabase"
+                "Ref": "rTrustedDatabase"
             },
             "Export": {
                 "Name": {

@@ -7,15 +7,12 @@
             "Type": "String"
         },
         "pProjectName":{
-            "Type":"String"
+            "Type":"String",
+            "Default":"climate"
         },
         "pEnvironment":{
             "Type":"String",
             "Default":"non-prod"
-        },
-        "pGlueServiceName":{
-            "Type":"String",
-            "Default":"trigger"
         }
     },
     "Resources": {
@@ -42,12 +39,8 @@
                             {
                                 "Ref":"pProjectName"
                             },
-                            {
-                                "Ref":"pEnvironment"
-                            },
-                            {
-                                "Ref":"pGlueServiceName"
-                            }
+                            "trusted",
+                            "trigger"
                         ]
                     ]
                 },

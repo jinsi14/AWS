@@ -1,0 +1,264 @@
+{
+    "Parameters": {
+        "pAccountNumber": {
+            "Type": "String"
+        },
+        "pRegion": {
+            "Type": "String",
+            "Default": "eu-west-1"
+        },
+        "pEnvironment":{
+          "Type":"String"  
+        },
+        "pScriptFile":{
+            "Type":"String"
+        },
+        "pRoleARN": {
+            "Type": "String"
+        },
+        "pGlueJobTimeout": {
+            "Type": "Number",
+            "Default": 60
+        },
+        "pProjectName":{
+            "Type":"String",
+            "Default":"climate"
+        },
+        "pSystemBucket":{
+            "Type":"String"
+        }
+    },
+    "Resources": {
+        "rTrustedGlueJob": {
+            "Type": "AWS::Glue::Job",
+            "Properties": {
+                "Command": {
+                    "Name": "glueetl",
+                    "ScriptLocation": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "s3://",
+                                {
+                                    "Ref": "pSystemBucket"
+                                },
+                                "/",
+                                "code",
+                                "/",
+                                {
+                                    "Ref": "pEnvironment"
+                                },
+                                "/",
+                                {
+                                    "Ref": "pScriptFile"
+                                }
+                            ]
+                        ]
+                    },
+                    "PythonVersion": "3"
+                },
+                "DefaultArguments": {
+                    "--enable-metrics": "true",
+                    "--enable-continuous-cloudwatch-log": "true",
+                    "--job-bookmark-option": "job-bookmark-disable",
+                    "--job-language": "python"
+                },
+                "GlueVersion": "4.0",
+                "MaxRetries": 1,
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            "trusted",
+                            "job"
+                        ]
+                    ]
+                },
+                "NumberOfWorkers": 2,
+                "Role": {
+                    "Ref": "pRoleARN"
+                },
+                "Timeout": {
+                    "Ref": "pGlueJobTimeout"
+                },
+                "WorkerType": "G.1X"
+            }
+        },
+        "rTrustedDatabase": {
+            "Type": "AWS::Glue::Database",
+            "Properties": {
+                "CatalogId": {
+                    "Ref": "pAccountNumber"
+                },
+                "DatabaseInput": {
+                    "LocationUri": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "s3://trusted-om-rc",
+                                "-",
+                                {
+                                    "Ref": "pRegion"
+                                },
+                                "-",
+                                {
+                                    "Ref": "pAccountNumber"
+                                },
+                                "/",
+                                {
+                                    "Ref":"pProjectName"
+                                },
+                                "/",
+                                {
+                                    "Ref": "pEnvironment"
+                                },
+                                "/"
+                            ]
+                        ]
+                    },
+                    "Name": {
+                        "Fn::Join": [
+                            "_",
+                            [
+                                "omgc",
+                                {
+                                    "Ref":"pProjectName"
+                                },
+                                "trusted",
+                                "database"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "rTrustedCrawler": {
+            "Type": "AWS::Glue::Crawler",
+            "Properties": {
+                "DatabaseName": {
+                    "Ref":"rTrustedDatabase"
+                },
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            "trusted",
+                            "crawler"
+                        ]
+                    ]
+                },
+                "RecrawlPolicy": {
+                    "RecrawlBehavior": "CRAWL_EVERYTHING"
+                },
+                "Role": {
+                    "Ref": "pRoleARN"
+                },
+                "SchemaChangePolicy": {
+                    "DeleteBehavior": "DELETE_FROM_DATABASE",
+                    "UpdateBehavior": "UPDATE_IN_DATABASE"
+                },
+                "Targets": {
+                    "S3Targets": [
+                        {
+                            "Path": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "s3://trusted-om-rc",
+                                        "-",
+                                        {
+                                            "Ref": "pRegion"
+                                        },
+                                        "-",
+                                        {
+                                            "Ref": "pAccountNumber"
+                                        },
+                                        "/",
+                                        {
+                                            "Ref":"pProjectName"
+                                        },
+                                        "/",
+                                        {
+                                            "Ref": "pEnvironment"
+                                        },
+                                        "/"
+                                    ]
+                                ]
+                            },
+                            "SampleSize": 10
+                        }
+                    ]
+                }
+            }
+        },
+        "rGlueJobTrigger": {
+            "Type": "AWS::Glue::Trigger",
+            "Properties": {
+                "Actions": [
+                    {
+                        "Arguments": {},
+                        "JobName": {
+                            "Ref":"rTrustedGlueJob"
+                        },
+                        "Timeout": 60
+                    }
+                ],
+                "Description": "Triggers a Glue Job",
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            "trusted",
+                            "trigger"
+                        ]
+                    ]
+                },
+                "Type": "ON_DEMAND"
+            }
+        }
+    },
+    "Outputs": {
+        "oIngestToTrustedGlueJobName": {
+            "Value": {
+                "Ref": "rTrustedGlueJob"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-GlueJobName"
+                }
+            }
+        },
+        "oDatabaseName": {
+            "Value": {
+                "Ref": "rTrustedDatabase"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-DatabaseName"
+                }
+            }
+        },
+        "oCuraTrustedCrawler": {
+            "Value": {
+                "Ref": "rTrustedCrawler"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CrawlerName"
+                }
+            }
+        }
+    }
+}

@@ -15,3 +15,10 @@ git config --global user.name "GeeksforGeeks"
 git config --global user.email "GFGexample@gmail.orgg"
 
 git config --global user.password "1234321"
+
+
+//git pull
+
+git pull <remote> <branch>
+
+git pull origin develop

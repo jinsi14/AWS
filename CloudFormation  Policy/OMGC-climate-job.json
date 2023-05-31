@@ -7,17 +7,11 @@
             "Type": "String",
             "Default": "ap-south-1"
         },
-        "pSystemBucket":{
-            "Type":"String",
-            "Default":"aws-glue-assets-829293625760-ap-south-1"
-        },
         "pEnvironment":{
-          "Type":"String",
-          "Default":"scripts"  
+          "Type":"String"  
         },
         "pScriptFile":{
-            "Type":"String",
-            "Default":"read data.py"
+            "Type":"String"
         },
         "pRoleARN": {
             "Type": "String"
@@ -27,15 +21,12 @@
             "Default": 60
         },
         "pProjectName":{
-            "Type":"String"
-        },
-        "pGlueServiceName":{
             "Type":"String",
-            "Default":"job"
+            "Default":"climate"
         }
     },
     "Resources": {
-        "rGlueJob": {
+        "rTrustedGlueJob": {
             "Type": "AWS::Glue::Job",
             "Properties": {
                 "Command": {
@@ -45,9 +36,12 @@
                             "",
                             [
                                 "s3://",
+                                "-",
                                 {
                                     "Ref": "pSystemBucket"
                                 },
+                                "/",
+                                "code",
                                 "/",
                                 {
                                     "Ref": "pEnvironment"
@@ -77,9 +71,8 @@
                             {
                                 "Ref":"pProjectName"
                             },
-                            {
-                                "Ref":"pGlueServiceName"
-                            }
+                            "trusted",
+                            "job"
                         ]
                     ]
                 },
@@ -97,7 +90,7 @@
     "Outputs": {
         "oIngestToTrustedGlueJobName": {
             "Value": {
-                "Ref": "rGlueJob"
+                "Ref": "rTrustedGlueJob"
             },
             "Export": {
                 "Name": {
