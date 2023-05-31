@@ -5,4 +5,8 @@ git clone https://jinsi14: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@github.com/ji
 
 password
 
+git config --global user.name "GeeksforGeeks"
+
+git config --global user.email "GFGexample@gmail.orgg"
+
 git config --global user.password "1234321"
