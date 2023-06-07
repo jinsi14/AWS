@@ -1,0 +1,74 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS CloudFormation Template for creating an analytics role in Group Compliance.",
+  "Parameters": {
+    "pEnvironment": {
+      "Description": "Environment (non-prod, prod)",
+      "Type": "String",
+      "AllowedValues": [
+        "non-prod",
+        "prod"
+      ],
+      "Default": "non-prod"
+    },
+    "pProject": {
+      "Type": "String",
+      "Default": "Group Compliance Data Domain"
+    }
+  },
+  "Resources" : {
+    "rCustomerOMGroupComplianceAnalyticsAdminSSPSRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "customer_om_group_compliance_analyticsadmin_ssps_role",
+        "Path": "/",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:saml-provider/customer-saml"
+                }
+              },
+              "Action": "sts:AssumeRoleWithSAML",
+              "Condition": {
+                "StringEquals": {
+                  "SAML:aud": "https://signin.aws.amazon.com/saml"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "RoleName": {
+      "Description": "Name of the created Role",
+      "Value": {
+        "Ref": "rCustomerOMGroupComplianceAnalyticsAdminSSPSRole"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-RoleName"
+        }
+      }
+    },
+    "RoleArn": {
+      "Description": "ARN of the created Role",
+      "Value": {
+        "Fn::GetAtt": [
+          "rCustomerOMGroupComplianceAnalyticsAdminSSPSRole",
+          "Arn"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-RoleArn"
+        }
+      }
+    }
+  }
+}

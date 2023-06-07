@@ -1,0 +1,376 @@
+{
+    "Parameters": {
+        "pSDLC": {
+            "Type": "String",
+            "Default": "dev"
+        },
+        "pRegion": {
+            "Type": "String",
+            "Default": "eu-west-1"
+        },
+        "pAccountNumber": {
+            "Type": "String"
+        },
+        "pEnvironment": {
+            "Type": "String",
+            "Default": "non-prod"
+        },
+        "pSystemBucket": {
+            "Type": "String"
+        },
+        "pIAMRole":{
+            "Type":"String"
+        }
+    },
+    "Resources": {
+        "rIAMPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "AllowSFN",
+                            "Effect": "Allow",
+                            "Action": [
+                                "states:Describe*",
+                                "states:List*",
+                                "states:Get*",
+                                "states:Start*",
+                                "states:Stop*",
+                                "states:Tag*",
+                                "states:Untag*"
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:states:",
+                                        {
+                                            "Ref": "pRegion"
+                                        },
+                                        ":",
+                                        {
+                                            "Ref": "pAccountNumber"
+                                        },
+                                        ":stateMachine:",
+                                        "OMGC",
+                                        "*",
+                                        {
+                                            "Ref": "pSDLC"
+                                        }
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Sid": "AllowLambda",
+                            "Effect": "Allow",
+                            "Action": [
+                                "lambda:Describe*",
+                                "lambda:List*",
+                                "lambda:Get*",
+                                "lambda:Invoke*",
+                                "lambda:Update*"
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:lambda:",
+                                        {
+                                            "Ref": "pRegion"
+                                        },
+                                        ":",
+                                        {
+                                            "Ref": "pAccountNumber"
+                                        },
+                                        ":function:OMGC-get-data-",
+                                        {
+                                            "Ref": "pSDLC"
+                                        },
+                                        "*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Sid": "AllowSSM",
+                            "Effect": "Allow",
+                            "Action": [
+                                "ssm:GetParameter"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:ssm:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":parameter*",
+                                            {
+                                                "Ref": "pEnvironment"
+                                            },
+                                            "/",
+                                            "*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSecrets",
+                            "Effect": "Allow",
+                            "Action": [
+                                "secretsmanager:GetSecretValue"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:secretsmanager:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":secret:*/",
+                                            {
+                                                "Ref": "pEnvironment"
+                                            },
+                                            "/*-api*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowS3",
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:Get*",
+                                "s3:Put*",
+                                "s3:Head*",
+                                "s3:List*",
+                                "s3:Delete*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::*-om-rc-",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            "-",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            "*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:s3:::",
+                                            {
+                                                "Ref": "pSystemBucket"
+                                            },
+                                            "*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowGlue",
+                            "Effect": "Allow",
+                            "Action": [
+                                "glue:Start*",
+                                "glue:*Partition*",
+                                "glue:*Connection*",
+                                "glue:*Table*",
+                                "glue:*Crawler*",
+                                "glue:*Job*",
+                                "glue:*Workflow*",
+                                "glue:*Database*",
+                                "glue:*Trigger*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:glue:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":catalog*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:glue:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":database/",
+                                            "omgc_*",
+                                            {
+                                                "Ref": "pEnvironment"
+                                            },
+                                            "_trusted_",
+                                            {
+                                                "Ref": "pSDLC"
+                                            },
+                                            "*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:glue:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":table/",
+                                            "omgc_*",
+                                            {
+                                                "Ref": "pEnvironment"
+                                            },
+                                            "_trusted_",
+                                            {
+                                                "Ref": "pSDLC"
+                                            },
+                                            "*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:glue:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":job/",
+                                            "OMGC-ingest-to-*-job-",
+                                            {
+                                                "Ref": "pSDLC"
+                                            },
+                                            "*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:glue:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":trigger/",
+                                            "OMGC-*-ingest-to-*-*-trigger-",
+                                            {
+                                                "Ref": "pSDLC"
+                                            },
+                                            "*"
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:glue:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":workflow/OMGC-*-ingest-data-",
+                                            {
+                                                "Ref": "pSDLC"
+                                            },
+                                            "*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowLogs",
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:Put*",
+                                "logs:Get*"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        }
+                    ]
+                },
+                "ManagedPolicyName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "cura",
+                            "workflow",
+                            {
+                                "Ref": "pSDLC"
+                            },
+                            "policy"
+                        ]
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "pIAMRole"
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,189 @@
+{
+    "Parameters": {
+        "pSDLC": {
+            "Type": "String",
+            "Default": "dev"
+        },
+        "pRegion": {
+            "Type": "String",
+            "Default": "eu-west-1"
+        },
+        "pAccountNumber": {
+            "Type": "String"
+        },
+        "pEnvironment": {
+            "Type": "String",
+            "Default": "non-prod"
+        }
+    },
+    "Resources": {
+        "rWorkflowUserPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "AllowSFNExecute",
+                            "Effect": "Allow",
+                            "Action": [
+                                "states:Describe*",
+                                "states:List*",
+                                "states:Get*",
+                                "states:Start*",
+                                "states:Stop*",
+                                "states:Tag*",
+                                "states:Untag*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:states:${pRegion}:${pAccountNumber}:stateMachine:OMGC*${pSDLC}"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSFNReadOnly",
+                            "Effect": "Allow",
+                            "Action": [
+                                "states:Describe*",
+                                "states:List*",
+                                "states:Get*"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "Sid": "AllowLambda",
+                            "Effect": "Allow",
+                            "Action": [
+                                "lambda:List*",
+                                "lambda:Get*",
+                                "lambda:Invoke*",
+                                "lambda:Update*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:lambda:${pRegion}:${pAccountNumber}:function:OMGC-get-data-${pSDLC}*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:lambda:${pRegion}:${pAccountNumber}:function:OMGC-publish-metrics-${pSDLC}*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSSM",
+                            "Effect": "Allow",
+                            "Action": [
+                                "ssm:GetParameter"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:ssm:${pRegion}:${pAccountNumber}:parameter:*${pEnvironment}/*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSecretsUpdate",
+                            "Effect": "Allow",
+                            "Action": [
+                                "secretsmanager:GetSecretValue",
+                                "secretsmanager:PutSecretValue",
+                                "secretsmanager:Describe*",
+                                "secretsmanager:List*",
+                                "secretsmanager:Tag*",
+                                "secretsmanager:Create*",
+                                "secretsmanager:Delete*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:secretsmanager:${pRegion}:${pAccountNumber}:secret:*/${pEnvironment}/*-api*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSecretsReadOnly",
+                            "Effect": "Allow",
+                            "Action": [
+                                "secretsmanager:Describe*",
+                                "secretsmanager:List*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowGlue",
+                            "Effect": "Allow",
+                            "Action": [
+                                "glue:List*",
+                                "glue:Get*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${pRegion}:${pAccountNumber}:catalog*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${pRegion}:${pAccountNumber}:database/omgc_*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${pRegion}:${pAccountNumber}:table/omgc_*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${pRegion}:${pAccountNumber}:job/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${pRegion}:${pAccountNumber}:trigger/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${pRegion}:${pAccountNumber}:workflow/*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowLogs",
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:Get*",
+                                "logs:Describe*"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "Sid": "AllowCloudwatch",
+                            "Effect": "Allow",
+                            "Action": [
+                                "cloudwatch:Put*",
+                                "cloudwatch:Get*",
+                                "cloudwatch:List*",
+                                "cloudwatch:Describe*"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        }
+                    ]
+                },
+                "ManagedPolicyName": {
+                    "Fn::Sub": "workflow-user-policy-${pSDLC}"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "rWorkflowUserPolicy": {
+            "Value": {
+                "Ref": "rWorkflowUserPolicy"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-WorkflowUserPolicy"
+                }
+            }
+        }
+    }
+}

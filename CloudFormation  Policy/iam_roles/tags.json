@@ -1,0 +1,53 @@
+"PermissionsBoundary" : {
+    "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:policy/AWSManagedServices_IAM_PermissionsBoundary"
+  },
+"Tags": [
+    {
+      "Key": "oml-cost-center",
+      "Value": "10065369"
+    },
+    {
+      "Key": "oml-application-name",
+      "Value": "Group Compliance DCC"
+    },
+    {
+      "Key": "oml-application-id",
+      "Value": "Group Compliance DCC"
+    },
+    {
+      "Key": "oml-department",
+      "Value": "Group Compliance"
+    },
+    {
+      "Key": "oml-environment",
+      "Value": {
+        "Ref": "pEnvironment"
+      }
+    },
+    {
+      "Key": "oml-project-name",
+      "Value": {
+        "Ref": "pProject"
+      }
+    },
+    {
+      "Key": "oml-resource-owner-team",
+      "Value": "Group Compliance"
+    },
+    {
+      "Key": "oml-resource-owner-team-email",
+      "Value": "leezaamlatoldmutual.com"
+    },
+    {
+      "Key": "oml-business-owner",
+      "Value": "Leezaam Leitch"
+    }
+  ]
+
+
+  "Principal": {
+    "Federated": {
+      "Fn::Sub": ["arn:aws:iam::${AWS::AccountId}:saml-provider/customer-saml",
+      "arn:aws:iam::${AWS::AccountId}:/*"]
+    }
+  },

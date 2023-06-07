@@ -1,0 +1,230 @@
+{
+    "Resources": {
+        "rCustomerOMGroupComplianceAnalyticsAdminSSPSPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "AllowSFNExecute",
+                            "Effect": "Allow",
+                            "Action": [
+                                "states:Start*",
+                                "states:Stop*",
+                                "states:Tag*",
+                                "states:Untag*",
+                                "states:List*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub":"arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:OMGC*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSFNReadOnly",
+                            "Effect": "Allow",
+                            "Action": [
+                                "states:Describe*",
+                                "states:List*",
+                                "states:Get*"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "Sid": "AllowLambda",
+                            "Effect": "Allow",
+                            "Action": [
+                                "lambda:List*",
+                                "lambda:Get*",
+                                "lambda:Invoke*",
+                                "lambda:Update*",
+                                "lambda:ListTags",
+                                "lambda:TagResource",
+                                "lambda:ListFunctions",
+                                "lambda:GetAccountSettings"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:OMGC*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSSM",
+                            "Effect": "Allow",
+                            "Action": [
+                                "ssm:GetParameter",
+                                "ssm:Getparameters",
+                                "ssm:GetParametersByPath",
+                                "ssm:DescribeParameters"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter:OMGC*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSecretsUpdate",
+                            "Effect": "Allow",
+                            "Action": [
+                                "secretsmanager:GetSecretValue",
+                                "secretsmanager:PutSecretValue",
+                                "secretsmanager:Describe*",
+                                "secretsmanager:List*",
+                                "secretsmanager:Tag*",
+                                "secretsmanager:Create*",
+                                "secretsmanager:Delete*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:OMGC*"
+
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowSecretsReadOnly",
+                            "Effect": "Allow",
+                            "Action": [
+                                "secretsmanager:Describe*",
+                                "secretsmanager:List*"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "Sid": "AllowGlue",
+                            "Effect": "Allow",
+                            "Action": [
+                                "glue:List*",
+                                "glue:Get*",
+                                "glue:Start*",
+                                "glue:*Partition*",
+                                "glue:*Connection*",
+                                "glue:*Table*",
+                                "glue:*Crawler*",
+                                "glue:*Job*",
+                                "glue:*Workflow*",
+                                "glue:*Database*",
+                                "glue:*Trigger*",
+                                "glue:getObject"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/omgc*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/OMGC*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/omgc*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/OMGC*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:job/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:trigger/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:workflow/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/OMGC*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowLogs",
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:Get*",
+                                "logs:Describe*",
+                                "logs:FilterLogEvents"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "Sid": "AllowCloudwatch",
+                            "Effect": "Allow",
+                            "Action": [
+                                "cloudwatch:Put*",
+                                "cloudwatch:Get*",
+                                "cloudwatch:List*",
+                                "cloudwatch:Describe*"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:OMGC*"
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowS3",
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:Get*",
+                                "s3:List*"
+                            ],
+                            "Resource": [
+                                    "arn:aws:s3:::/*"
+                            ]
+                        },
+                        {
+                            "Sid": "AllowIAM",
+                            "Effect": "Allow",
+                            "Action": [
+                                "iam:ListPolicies",
+                                "iam:GetPolicy",
+                                "iam:ListEntitiesForPolicy",
+                                "iam:ListUserPolicies",
+                                "iam:GetUserPolicy",
+                                "iam:ListGroupsForUser",
+                                "iam:ListAttachedUserPolicies",
+                                "iam:ListUsers",
+                                "iam:GetUser"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Sid": "AllowUsersToSeeStatsOnIAMConsoleDashboard",
+                            "Effect": "Allow",
+                            "Action": [
+                                "iam:ListAccount*"
+                            ],
+                            "Resource": "*"
+                        }
+                    ]
+                },
+                "ManagedPolicyName": {
+                    "Fn::Sub": "customer_om_group_compliance_analytics_admin_policy"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "rCustomerOMGroupComplianceAnalyticsAdminSSPSPolicy": {
+            "Value": {
+                "Ref": "rCustomerOMGroupComplianceAnalyticsAdminSSPSPolicy"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CustomerOMGroupComplianceAnalyticsAdminPolicy"
+                }
+            }
+        }
+    }
+}

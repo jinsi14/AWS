@@ -1,0 +1,44 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CloudFormation template for EventBridge rule 'om-rc-event-bridge-rule-non-prod-schedule'",
+    "Parameters": {
+        "pFunctionName":{
+            "Type":"String",
+            "Default":"helloWorld"
+        },
+        "pScheduleExpression":{
+            "Type":"String",
+            "Default":"cron(0/1 * * * ? *)"
+        },
+        "pId":{
+            "Type":"String"
+        },
+        "pFunctionArn":{
+            "Type":"String",
+            "Default":"arn:aws:lambda:ap-south-1:829293625760:function:helloWorld"
+        }
+    },
+    "Resources": {
+      "EventRule": {
+        "Type": "AWS::Events::Rule",
+        "Properties": {
+          "EventBusName": "default",
+          "Name": {
+            "Ref":"pFunctionName"
+          },
+          "ScheduleExpression": {
+            "Ref":"pScheduleExpression"
+          },
+          "State": "ENABLED",
+          "Targets": [{
+            "Id": {
+                "Ref":"pId"
+            },
+            "Arn": {
+                "Ref":"pFunctionArn"
+            }
+          }]
+        }
+      }
+    }
+}

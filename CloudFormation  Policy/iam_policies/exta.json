@@ -1,0 +1,35 @@
+"Sid": "AllowSFNExecute",
+"arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:OMGC*",
+
+"Sid": "AllowSFNReadOnly"
+*
+
+"Sid": "AllowLambda",
+"Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:OMGC*"
+
+"Sid": "AllowSSM",
+"Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter:OMGC*",
+
+"Sid": "AllowSecretsUpdate",
+"Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:OMGC*"
+
+"Sid": "AllowSecretsReadOnly",
+"Fn::Sub": "*"
+
+"Sid": "AllowGlue",
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog*"
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/omgc*"
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/OMGC*"
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/omgc*"
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/OMGC*"
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:job/*"
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:trigger/*"
+"Fn::Sub": "arn:aws:glue:${AWS::Region}:${AWS::AccountId}:workflow/*"
+
+"Sid": "AllowLogs",
+"Resource": [
+    "*"
+]
+
+"Sid": "AllowCloudwatch",
+"Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:OMGC*"

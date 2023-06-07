@@ -1,0 +1,97 @@
+{
+    "Parameters": {
+        "pSDLC": {
+            "Type": "String",
+            "Default": "dev"
+        },
+        "pRegion": {
+            "Type": "String",
+            "Default": "eu-west-1"
+        },
+        "pAccountNumber": {
+            "Type": "String"
+        },
+        "pEnvironment": {
+            "Type": "String",
+            "Default": "non-prod"
+        },
+        "pSystemBucket": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "rIAMRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "states.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "glue.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Description": "Used for the CURA Workflow",
+                "MaxSessionDuration": 3600,
+                "RoleName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "cura",
+                            "workflow",
+                            {
+                                "Ref": "pSDLC"
+                            },
+                            "role"
+                        ]
+                    ]
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "oIAMRoleARN": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "rIAMRole",
+                    "Arn"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-IAMRoleARN"
+                }
+            }
+        }
+    }
+}

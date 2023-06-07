@@ -13,6 +13,9 @@
         "pEnvironment":{
             "Type":"String",
             "Default":"non-prod"
+        },
+        "pGlueWorkflowStackName": {
+            "Type": "String"
         }
     },
     "Resources": {
@@ -44,7 +47,12 @@
                         ]
                     ]
                 },
-                "Type": "ON_DEMAND"
+                "Type": "ON_DEMAND",
+                "WorkflowName": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${pGlueWorkflowStackName}-CuraWorkflowName"
+                    }
+                }
             }
         }
     }

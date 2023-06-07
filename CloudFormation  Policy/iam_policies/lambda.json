@@ -1,0 +1,87 @@
+{
+    "Parameters": {
+        "PIAMRole": {
+            "Type": "String"
+        },
+        "pRegion":{
+            "Type":"String",
+            "Default":"ap-south-1"
+        },
+        "pAccountNumber":{
+            "Type":"String",
+            "Default":"829293625760"
+        }
+    },
+    "Resources": {
+        "rCustomerOMGroupComplianceAnalyticsAdminSSPSPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "AllowLambda",
+                            "Effect": "Allow",
+                            "Action": [
+                                "lambda:List*",
+                                "lambda:Get*",
+                                "lambda:Invoke*",
+                                "lambda:Update*",
+                                "lambda:ListTags",
+                                "lambda:TagResource",
+                                "lambda:ListFunctions",
+                                "lambda:GetAccountSettings"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "arn:aws:lambda:",
+                                            {
+                                                "Ref": "pRegion"
+                                            },
+                                            ":",
+                                            {
+                                                "Ref": "pAccountNumber"
+                                            },
+                                            ":function:OMGC*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Sid": "AllowUsersToSeeStatsOnIAMConsoleDashboard",
+                            "Effect": "Allow",
+                            "Action": [
+                                "iam:ListAccount*"
+                            ],
+                            "Resource": "*"
+                        }
+                    ]
+                },
+                "ManagedPolicyName": {
+                    "Fn::Sub": "customer_om_group_compliance_analytics_admin_lambda_policy"
+                },
+                "Roles": [
+                    {
+                        "Ref": "PIAMRole"
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "rCustomerOMGroupComplianceAnalyticsAdminSSPSPolicy": {
+            "Value": {
+                "Ref": "rCustomerOMGroupComplianceAnalyticsAdminSSPSPolicy"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CustomerOMGroupComplianceAnalyticsAdminPolicy"
+                }
+            }
+        }
+    }
+}

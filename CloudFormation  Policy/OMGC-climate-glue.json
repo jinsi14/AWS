@@ -26,6 +26,9 @@
         },
         "pSystemBucket":{
             "Type":"String"
+        },
+        "pMaxConcurrentRuns": {
+            "Type": "Number"
         }
     },
     "Resources": {
@@ -225,7 +228,32 @@
                         ]
                     ]
                 },
-                "Type": "ON_DEMAND"
+                "Type": "ON_DEMAND",
+                "WorkflowName": {
+                    "Ref":"rWorkflow"
+                }
+            }
+        },
+        "rWorkflow": {
+            "Type": "AWS::Glue::Workflow",
+            "Properties": {
+                "Description": "Transfers data between storage layers",
+                "MaxConcurrentRuns": {
+                    "Ref": "pMaxConcurrentRuns"
+                },
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            "trusted",
+                            "trigger"
+                        ]
+                    ]
+                }
             }
         }
     },
@@ -257,6 +285,16 @@
             "Export": {
                 "Name": {
                     "Fn::Sub": "${AWS::StackName}-CrawlerName"
+                }
+            }
+        },
+        "oWorkflow": {
+            "Value": {
+                "Ref": "rWorkflow"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-WorkflowName"
                 }
             }
         }

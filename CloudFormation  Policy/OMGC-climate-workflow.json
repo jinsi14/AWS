@@ -3,9 +3,9 @@
         "pMaxConcurrentRuns": {
             "Type": "Number"
         },
-        "pworkflowName":{
+        "pProjectName":{
             "Type":"String",
-            "Default":"OMGC-climate-workflow"
+            "Default":"climate"
         }
     },
     "Resources": {
@@ -17,7 +17,17 @@
                     "Ref": "pMaxConcurrentRuns"
                 },
                 "Name": {
-                    "Ref":"pworkflowName"
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OMGC",
+                            {
+                                "Ref":"pProjectName"
+                            },
+                            "trusted",
+                            "trigger"
+                        ]
+                    ]
                 }
             }
         }
